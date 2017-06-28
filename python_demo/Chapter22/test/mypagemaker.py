@@ -19,3 +19,35 @@ class Dispatcher:
 
     def endElement(self, name, attrs):
         self.dispatcher(self, "end", name, attrs)
+
+class WebsiteContructor(Dispatcher, ContentHandler):
+
+    passthrough = False
+    def __init__(self, dir):
+        self.dirctory = [dir]
+        self.ensureDirctory()
+
+    def ensureDirctory(self):
+        path = os.path.join(*self.dirctory)
+        os.mkdir(path, exist_ok=True)
+
+    
+
+    def startPage(self, attrs):
+        passthrough = True
+        path = os.path.join(*self.dirctory + attrs['name'] + ".html")
+        self.out = open(path, 'w')
+        self.writeTitle(attrs['title'])
+
+    def endPage(self):
+        self.writeFooter()
+        self.out.close()
+        passthrough = False
+
+    def writeTitle(self, title):
+        self.out.write("<html>\n<title>\n")
+        self.out.write(title)
+        self.out.write("\n</title>\n<body>")
+
+    def writeFooter(self):
+        self.out.write("</body>\n</html>")
